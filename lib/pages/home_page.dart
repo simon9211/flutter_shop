@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import '../service/service_method.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'dart:convert';
 
 
@@ -31,15 +32,23 @@ class _HomePageState extends State<HomePage> {
         future: getHomePageContent(),
         builder: (context, snapshot){
           if (snapshot.hasData) {
-            var data = snapshot.data;
-            List<Map> swiper = (data['data']['slides'] as List).cast();
+            var data = snapshot.data['data'];
+            List<Map> swiper = (data['slides'] as List).cast();
+            List<Map> navigatorList = (data['category'] as List).cast();
+            String adPicture = data['advertesPicture']['picture_adress'];
+            String leaderImage = data['shopInfo']['leaderImage'];
+            String leaderPhone = data['shopInfo']['leaderPhone'];
             return Column(
               children: <Widget>[
-                SwiperDiy(swiperDataList: swiper,)
+                SwiperDiy(swiperDataList: swiper,),
+                TopNavigator(navigatorList: navigatorList,),
+                AdBanner(adPicture: adPicture,),
+                LeaderPhone(leaderImage: leaderImage, leaderPhone: leaderPhone,)
+
               ],
             );
           } else {
-            return Center(child: Text('no data'),);
+            return Center(child: Text(homePageContent),);
           }
         },
       )
@@ -47,9 +56,103 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
+// 首页轮播
+class SwiperDiy extends StatelessWidget {
+  final List swiperDataList;
 
+  const SwiperDiy({Key key, this.swiperDataList}) : super(key: key);
 
+  // const SwiperDiy({this.swiperDataList});
+  @override
+  Widget build(BuildContext context) {
+    print('设备像素密度 ${ScreenUtil.pixelRatio}');
+    print('设备高度 ${ScreenUtil.screenHeight}');
+    print('设备宽度 ${ScreenUtil.screenWidth}');
+    return Container(
+      color: Colors.green,
+      height: ScreenUtil().setHeight(300),
+      width: ScreenUtil().setWidth(750),
+      child: Swiper(
+        itemBuilder: (BuildContext context, int index) {
+          return Image.network('${swiperDataList[index]['image']}', fit: BoxFit.fill,);
+        },
+      itemCount: swiperDataList.length,
+      pagination: SwiperPagination(),
+      autoplay: true,
+      ),
+    );
+  }
+}
 
+// 菜单
+class TopNavigator extends StatelessWidget {
+  final List navigatorList;
+
+  const TopNavigator({Key key, this.navigatorList}) : super(key: key);
+  
+  Widget _gridViewItemUI(BuildContext context, item) {
+    return InkWell(
+      onTap: (){print('click navi item');},
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Image.network(item['image'], width: ScreenUtil().setWidth(95),),
+          Text(item['mallCategoryName'])
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: ScreenUtil().setHeight(280),
+      padding: EdgeInsets.all(3.0),
+      child: GridView.count(
+        crossAxisCount: 5,
+        padding: EdgeInsets.all(5.0),
+        children: navigatorList.map((item){
+          return _gridViewItemUI(context, item);
+        }).toList(),
+      ),
+    );
+  }
+}
+
+// 广告
+class AdBanner extends StatelessWidget {
+  final String adPicture;
+
+  const AdBanner({Key key, this.adPicture}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.green,
+      child: Image.network(adPicture, height: ScreenUtil().setHeight(60), width: ScreenUtil().setWidth(750), fit: BoxFit.fill,),
+    );
+  }
+}
+
+// 店长电话
+class LeaderPhone extends StatelessWidget {
+  final String leaderImage, leaderPhone;
+
+  const LeaderPhone({Key key, this.leaderImage, this.leaderPhone}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: InkWell(
+        onTap: (){},
+        child: Image.network(leaderImage),
+      ),
+    );
+  }
+}
+
+// demo
 class HomePage1 extends StatefulWidget {
   HomePage1({Key key}) : super(key: key);
 
@@ -142,30 +245,5 @@ class _HomePage1State extends State<HomePage1> {
     } catch (error) {
       return print(error);
     }
-  }
-}
-
-
-// 首页轮播
-class SwiperDiy extends StatelessWidget {
-  final List swiperDataList;
-
-  const SwiperDiy({Key key, this.swiperDataList}) : super(key: key);
-
-  // const SwiperDiy({this.swiperDataList});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 333,
-      child: Swiper(
-        itemBuilder: (BuildContext context, int index) {
-          return Image.network('${swiperDataList[index]['image']}', fit: BoxFit.fill,);
-        },
-      itemCount: swiperDataList.length,
-      pagination: SwiperPagination(),
-      autoplay: true,
-      ),
-    );
   }
 }
