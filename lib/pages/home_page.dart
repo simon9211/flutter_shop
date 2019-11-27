@@ -4,27 +4,27 @@ import '../service/service_method.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_easyrefresh/easy_refresh.dart';
 
 class HomePage extends StatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin {
+class _HomePageState extends State<HomePage>
+    with AutomaticKeepAliveClientMixin {
   String homePageContent = '正在获取数据';
   int page = 1;
   List<Map> hotGoodsList = [];
   @override
   void initState() {
-    
     super.initState();
     print('1111111');
-    _getHotGoods();
+    //_getHotGoods();
   }
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
         appBar: AppBar(
           title: Text('百姓生活+'),
@@ -45,9 +45,18 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin 
               String floorTitle = data['floorPic']['picture_address'];
               List<Map> floor = (data['floor'] as List).cast();
 
-
-              return SingleChildScrollView(
-                child: Column(
+              return EasyRefresh(
+                footer: ClassicalFooter(
+                  bgColor: Colors.green,
+                  textColor: Colors.pink,
+                  infoColor: Colors.pink,
+                  noMoreText: 'no more data',
+                  infoText: 'info text',
+                  loadingText: 'loading …',
+                  loadText: 'loading more',
+                  showInfo: true
+                ),
+                child: ListView(
                   children: <Widget>[
                     SwiperDiy(
                       swiperDataList: swiper,
@@ -62,16 +71,42 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin 
                       leaderImage: leaderImage,
                       leaderPhone: leaderPhone,
                     ),
-                    Recomand(recomandList: recomandList,),
-                    FloorTitle(pictureAdress: floorTitle,),
-                    FloorContent(floorGoodsList: floor,),
-                    FloorTitle(pictureAdress: floorTitle,),
-                    FloorContent(floorGoodsList: floor,),
+                    Recomand(
+                      recomandList: recomandList,
+                    ),
+                    FloorTitle(
+                      pictureAdress: floorTitle,
+                    ),
+                    FloorContent(
+                      floorGoodsList: floor,
+                    ),
+                    FloorTitle(
+                      pictureAdress: floorTitle,
+                    ),
+                    FloorContent(
+                      floorGoodsList: floor,
+                    ),
                     // HotGoods(),
                     _hotGoods()
-
                   ],
                 ),
+                onLoad: () async {
+                  print('onLoad');
+                  var formPage = {'page': page};
+                  request('homePageBelowContent', formData: formPage)
+                      .then((val) {
+                    var data = val['data'];
+                    List<Map> newHotGoodsList =
+                        (data['hotGoods'] as List).cast();
+                    setState(() {
+                      hotGoodsList.addAll(newHotGoodsList);
+                      page++;
+                    });
+                  });
+                },
+                onRefresh: () async {
+                  print('onRefresh');
+                },
               );
             } else {
               return Center(
@@ -106,9 +141,9 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin 
 
   Widget _wrapList() {
     if (hotGoodsList.length != 0) {
-      List<Widget> listWidget = hotGoodsList.map((item){
+      List<Widget> listWidget = hotGoodsList.map((item) {
         return InkWell(
-          onTap: (){},
+          onTap: () {},
           child: Container(
             width: ScreenUtil().setWidth(372),
             color: Colors.white,
@@ -124,15 +159,16 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin 
                   item['name'],
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(color: Colors.pink, fontSize: ScreenUtil().setSp(26)),
+                  style: TextStyle(
+                      color: Colors.pink, fontSize: ScreenUtil().setSp(26)),
                 ),
                 Row(
                   children: <Widget>[
                     Text('¥${item['mallPrice']}'),
-                    Text(
-                      '¥${item['price']}',
-                      style: TextStyle(color: Colors.black26, decoration: TextDecoration.lineThrough)
-                    )
+                    Text('¥${item['price']}',
+                        style: TextStyle(
+                            color: Colors.black26,
+                            decoration: TextDecoration.lineThrough))
                   ],
                 )
               ],
@@ -143,7 +179,8 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin 
 
       return Wrap(
         spacing: 2,
-        children: listWidget,);
+        children: listWidget,
+      );
     } else {
       return Text('data');
     }
@@ -152,10 +189,7 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin 
   Widget _hotGoods() {
     return Container(
       child: Column(
-        children: <Widget>[
-          hotTitle,
-          _wrapList()
-        ],
+        children: <Widget>[hotTitle, _wrapList()],
       ),
     );
   }
@@ -223,6 +257,7 @@ class TopNavigator extends StatelessWidget {
       height: ScreenUtil().setHeight(280),
       padding: EdgeInsets.all(3.0),
       child: GridView.count(
+        physics: NeverScrollableScrollPhysics(),
         crossAxisCount: 5,
         padding: EdgeInsets.all(5.0),
         children: navigatorList.map((item) {
@@ -293,47 +328,41 @@ class Recomand extends StatelessWidget {
       alignment: Alignment.centerLeft,
       padding: EdgeInsets.fromLTRB(10, 2.0, 0, 5),
       decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border(
-          bottom: BorderSide(width: 0.5, color: Colors.black12)
-        )
-      ),
+          color: Colors.white,
+          border:
+              Border(bottom: BorderSide(width: 0.5, color: Colors.black12))),
       child: Text(
         '商品推荐',
         style: TextStyle(color: Colors.pink),
-        ),
+      ),
     );
   }
 
   // 商品
   Widget _item(index) {
     return InkWell(
-      onTap: (){},
+      onTap: () {},
       child: Container(
         height: ScreenUtil().setHeight(330),
         width: ScreenUtil().setWidth(250),
         padding: EdgeInsets.all(8.0),
         decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border(
-            left: BorderSide(width: 0.5, color: Colors.black12)
-          )
-        ),
+            color: Colors.white,
+            border:
+                Border(left: BorderSide(width: 0.5, color: Colors.black12))),
         child: Column(
           children: <Widget>[
             Image.network(
               recomandList[index]['image'],
               height: ScreenUtil().setHeight(230),
               fit: BoxFit.fill,
-              ),
+            ),
             Text('¥${recomandList[index]['price']}'),
             Text(
               '¥${recomandList[index]['mallPrice']}',
               style: TextStyle(
-                decoration: TextDecoration.lineThrough,
-                color: Colors.grey
-              ),
-              )
+                  decoration: TextDecoration.lineThrough, color: Colors.grey),
+            )
           ],
         ),
       ),
@@ -348,7 +377,7 @@ class Recomand extends StatelessWidget {
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: recomandList.length,
-        itemBuilder: (context, index){
+        itemBuilder: (context, index) {
           return _item(index);
         },
       ),
@@ -361,10 +390,7 @@ class Recomand extends StatelessWidget {
       height: ScreenUtil().setHeight(380),
       margin: EdgeInsets.only(top: 10),
       child: Column(
-        children: <Widget>[
-          _titleWidget(),
-          _recomandList()
-        ],
+        children: <Widget>[_titleWidget(), _recomandList()],
       ),
     );
   }
@@ -372,7 +398,6 @@ class Recomand extends StatelessWidget {
 
 // 楼层title
 class FloorTitle extends StatelessWidget {
-
   final String pictureAdress;
 
   const FloorTitle({Key key, this.pictureAdress}) : super(key: key);
@@ -396,10 +421,7 @@ class FloorContent extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       child: Column(
-        children: <Widget>[
-          _firstRow(),
-          _otherGoods()
-        ],
+        children: <Widget>[_firstRow(), _otherGoods()],
       ),
     );
   }
@@ -431,10 +453,10 @@ class FloorContent extends StatelessWidget {
     return Container(
       width: ScreenUtil().setWidth(375),
       child: InkWell(
-        onTap: (){print('item click');},
-        child: Image.network(
-          goods['image']
-        ),
+        onTap: () {
+          print('item click');
+        },
+        child: Image.network(goods['image']),
       ),
     );
   }
@@ -447,11 +469,10 @@ class HotGoods extends StatefulWidget {
 }
 
 class _HotGoodsState extends State<HotGoods> {
-
   @override
   void initState() {
     super.initState();
-    request('homePageBelowContent').then((val){
+    request('homePageBelowContent').then((val) {
       print('hot goods $val');
     });
   }
@@ -463,7 +484,6 @@ class _HotGoodsState extends State<HotGoods> {
     );
   }
 }
-
 
 /// demo
 class HomePage1 extends StatefulWidget {
