@@ -27,6 +27,7 @@ class _IndexPageState extends State<IndexPage> {
   final _bottomNavigationColorSelected = Colors.pink;
   final _bottomNavigationColorNormal = Colors.grey;
   int _currentIndex = 0;
+  var _currentPage;
   List<Widget> _items = [];
 
   @override
@@ -54,7 +55,10 @@ class _IndexPageState extends State<IndexPage> {
       // appBar: AppBar(
       //   title: bottomTabs[_currentIndex].title,
       // ), 
-      body: _items[_currentIndex],
+      body: IndexedStack(
+        index: _currentIndex,
+        children: _items,
+      ),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         currentIndex: _currentIndex,
