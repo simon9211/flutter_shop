@@ -24,7 +24,8 @@ class Number extends StatelessWidget {
           builder: (context, child, counter) {
             return Text('${counter.value}');
           },
-        ));
+        )
+        );
   }
 }
 

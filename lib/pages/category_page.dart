@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_shop/pages/home_page.dart';
+import 'package:provide/provide.dart';
 import '../service/service_method.dart';
 import '../model/category.dart';
+import '../provide/child_category.dart';
 
 class CategoryPage extends StatefulWidget {
   @override
@@ -15,7 +17,6 @@ class _CategoryPageState extends State<CategoryPage> {
 
   @override
   void initState() {
-    _selectIndex = 0;
     _categoryModelList = [];
     _getCategory();
     super.initState();
@@ -31,12 +32,12 @@ class _CategoryPageState extends State<CategoryPage> {
         children: <Widget>[
           LeftCategoryNavi(
             _categoryModelList,
-            onSelected: (index) {
-              setState(() {
-                _selectIndex = index;
-              });
-              print('category index $index');
-            },
+            // onSelected: (index) {
+            //   setState(() {
+            //     _selectIndex = index;
+            //   });
+            //   print('category index $index');
+            // },
           ),
           Expanded(
             child: Column(
@@ -44,26 +45,43 @@ class _CategoryPageState extends State<CategoryPage> {
                 SizedBox(
                   height: 10,
                 ),
-                TopSubCategoryWidget(
-                  _categoryModelList[_selectIndex],
-                  onSelected: (index) {
-                    print('sub index $index');
+                Provide<ChildCategory>(
+                  builder: (context, child, childCategory) {
+                    return TopSubCategoryWidget(
+                      childCategory.childCategoryList,
+                      onSelected: (index) {
+                        print('sub index $index');
+                      },
+                    );
                   },
                 ),
                 Expanded(
-                  child: GridView.count(
-                    crossAxisCount: 2,
-                    padding: EdgeInsets.all(5.0),
-                    children: List.generate(10,(i) => _gridViewItemUI(context, {
-                        "image":
-                            "https://www.baidu.com/img/bd_logo1.png?where=super",
-                        "mallCategoryName": "百度"
-                      }),
-                    ),
-                ))
+                    child: GridView.count(
+                  crossAxisCount: 2,
+                  padding: EdgeInsets.all(5.0),
+                  children: List.generate(
+                    10,
+                    (i) => _gridViewItemUI(context, {
+                      "image":
+                          "https://www.baidu.com/img/bd_logo1.png?where=super",
+                      "mallCategoryName": "百度"
+                    }),
+                  ),
+                )),
+                Provide<SubCategory>(
+            builder: (context, child, item) {
+                    return Text(
+                      item != null ?
+                      item.subCategoryModel.mallSubName:
+                      'item.subCategoryModel.mallSubName'
+                    );
+                  },
+
+          )
+
               ],
             ),
-          )
+          ),
         ],
       ),
     );
@@ -114,15 +132,22 @@ class LeftCategoryNavi extends StatefulWidget {
 
 class _LeftCategoryNaviState extends State<LeftCategoryNavi> {
   int _selectIndex;
-
+  bool _isFirst;
   @override
   void initState() {
+    _isFirst = true;
     _selectIndex = 0;
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    if (_isFirst) {
+      final _currentList = Provide.value<ChildCategory>(context);
+      _currentList.getChildCategory(widget.categoryModelList[0].bxMallSubDto);
+      _isFirst = false;
+    }
+
     return Container(
       width: ScreenUtil().setWidth(180),
       decoration: BoxDecoration(
@@ -138,9 +163,12 @@ class _LeftCategoryNaviState extends State<LeftCategoryNavi> {
   }
 
   Widget _leftInkWell(int index) {
+    final _currentList = Provide.value<ChildCategory>(context);
     return InkWell(
       onTap: () {
-        widget.onSelected(index);
+        _currentList
+            .getChildCategory(widget.categoryModelList[index].bxMallSubDto);
+        // widget.onSelected(index);
         if (_selectIndex != index) {
           setState(() {
             _selectIndex = index;
@@ -166,10 +194,10 @@ class _LeftCategoryNaviState extends State<LeftCategoryNavi> {
 }
 
 class TopSubCategoryWidget extends StatefulWidget {
-  final CategoryModel model;
+  final List<CategoryItemModel> subCategoryList;
   final ValueChanged<int> onSelected;
 
-  const TopSubCategoryWidget(this.model, {this.onSelected});
+  const TopSubCategoryWidget(this.subCategoryList, {this.onSelected});
 
   @override
   _TopSubCategoryWidgetState createState() => _TopSubCategoryWidgetState();
@@ -187,7 +215,7 @@ class _TopSubCategoryWidgetState extends State<TopSubCategoryWidget> {
   @override
   Widget build(BuildContext context) {
     List<Widget> categoryWidgetList =
-        List.generate(widget.model.bxMallSubDto.length, (i) {
+        List.generate(widget.subCategoryList.length, (i) {
       return _topInkWell(i + 1);
     });
 
@@ -210,7 +238,7 @@ class _TopSubCategoryWidgetState extends State<TopSubCategoryWidget> {
           right: 5,
         ),
         child: Text(
-          index == 0 ? '全部' : widget.model.bxMallSubDto[index - 1].mallSubName,
+          index == 0 ? '全部' : widget.subCategoryList[index - 1].mallSubName,
           style: TextStyle(
               fontSize: ScreenUtil().setSp(28),
               color: index != _selectIndex ? Colors.black : Colors.pink),
@@ -218,7 +246,9 @@ class _TopSubCategoryWidgetState extends State<TopSubCategoryWidget> {
       ),
       onTap: () {
         if (_selectIndex != index) {
-          widget.onSelected(index);
+          // widget.onSelected(index);
+          final _currentList = Provide.value<SubCategory>(context);
+          _currentList.getCategoryItemModel(widget.subCategoryList[index - 1]);
           setState(() {
             _selectIndex = index;
           });
