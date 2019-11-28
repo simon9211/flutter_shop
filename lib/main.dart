@@ -1,8 +1,20 @@
 import 'package:flutter/material.dart';
 
 import 'pages/index_page.dart';
+import 'package:provide/provide.dart';
+import 'provide/counter.dart';
 
-void main() => runApp(MyApp());
+void main() {
+  // var counter = Counter();
+  var providers = Providers()
+    // ..provide(Provider<Counter>.value(counter));
+    ..provide(Provider.function((context) => Counter()));
+
+  runApp(ProviderNode(
+    child: MyApp(),
+    providers: providers,
+  ));
+}
 
 class MyApp extends StatelessWidget {
   @override
@@ -13,7 +25,7 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         theme: ThemeData(primaryColor: Colors.pink),
         home: IndexPage(),
-    ),
+      ),
     );
   }
 }
