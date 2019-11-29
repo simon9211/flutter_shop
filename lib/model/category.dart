@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 class CategoryListModel {
 
   List<CategoryModel> data;
@@ -53,6 +55,40 @@ class CategoryItemModel {
       comments: json['comments']
       );
   }
+}
 
+// detail
+class CategoryDetailListModel {
+  List<CategoryDetailItemModel> data;
+
+  CategoryDetailListModel(this.data);
+
+  factory CategoryDetailListModel.fromJson(List json) {
+
+    List<CategoryDetailItemModel> list = [];
+    json.forEach((item) => list.add(CategoryDetailItemModel.fromJson(item)));
+    return CategoryDetailListModel(list);
+  }
+
+}
+
+class CategoryDetailItemModel {
+
+  String goodsName, goodsId, image;
+  double oriPrice, presentPrice;
+
+  CategoryDetailItemModel({this.goodsName, this.goodsId, this.image, this.oriPrice, this.presentPrice});
+
+
+  factory CategoryDetailItemModel.fromJson(Map json) {
+
+    return CategoryDetailItemModel(
+      goodsName: json['goodsName'],
+      goodsId: json['goodsId'],
+      image: json['image'],
+      oriPrice: json['oriPrice'],
+      presentPrice: json['presentPrice'],
+    );
+  }
 }
 

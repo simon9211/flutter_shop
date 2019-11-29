@@ -14,12 +14,14 @@ class CategoryPage extends StatefulWidget {
 class _CategoryPageState extends State<CategoryPage> {
   int _selectIndex;
   List<CategoryModel> _categoryModelList;
+  CategoryDetailListModel _detailList;
 
   @override
   void initState() {
     _categoryModelList = [];
     _getCategory();
     super.initState();
+    _getCategoryDetail();
   }
 
   @override
@@ -55,20 +57,20 @@ class _CategoryPageState extends State<CategoryPage> {
                     );
                   },
                 ),
-                Expanded(
-                    child: Provide<SubCategory>(
-                  builder: (context, child, item) {
+                Expanded(child: Provide<SubCategory>(
+                  builder: (context, child, it) {
                     return GridView.count(
-                  crossAxisCount: 2,
-                  padding: EdgeInsets.all(5.0),
-                  children: List.generate(100, (i) => _gridViewItemUI(context, {
-                      "image":"https://www.baidu.com/img/bd_logo1.png?where=super",
-                      "mallCategoryName": item != null? item.subCategoryModel.mallSubName:"百度"}),
-                  ),
-                );
+                      crossAxisCount: 2,
+                      padding: EdgeInsets.all(5.0),
+                      children: _detailList != null
+                          ? List.generate(
+                              _detailList.data.length,
+                              (i) => _gridViewItemUI(context, item: _detailList.data[i], model:it.subCategoryModel),
+                            )
+                          : [Text('null')],
+                    );
                   },
-                )
-                ),
+                )),
               ],
             ),
           ),
@@ -77,7 +79,7 @@ class _CategoryPageState extends State<CategoryPage> {
     );
   }
 
-  Widget _gridViewItemUI(BuildContext context, item) {
+  Widget _gridViewItemUI(BuildContext context, {CategoryDetailItemModel item, CategoryItemModel model}) {
     return InkWell(
       onTap: () {
         print('click navi item');
@@ -87,10 +89,43 @@ class _CategoryPageState extends State<CategoryPage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           Image.network(
-            item['image'],
+            item.image,
             width: ScreenUtil().setWidth(150),
           ),
-          Text(item['mallCategoryName'])
+          Container(
+            margin: EdgeInsets.only(left: 10, right: 0),
+            alignment: Alignment.topLeft,
+            height: 40,
+            child: Text(
+              item.goodsName, 
+              maxLines: 2, 
+              textAlign: TextAlign.center,
+            ),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Text(
+                '¥${item.presentPrice}', 
+                style: TextStyle(
+                  color: Colors.red
+                ),
+                textAlign: TextAlign.left,
+              ),
+              SizedBox(
+                width: 10,
+              ),
+              Text(
+                '¥${item.oriPrice}',
+                style: TextStyle(
+                    color: Colors.black26,
+                    decoration: TextDecoration.lineThrough)
+              ),
+              Text(
+                ' (${model.mallSubName})'
+              )
+            ],
+          )
         ],
       ),
     );
@@ -98,7 +133,7 @@ class _CategoryPageState extends State<CategoryPage> {
 
   void _getCategory() async {
     request('categoryPageContent').then((val) {
-      var data = val['data'];
+      final data = val['data'];
       CategoryListModel category = CategoryListModel.fromJson(data['category']);
       print('data count ====${category.data.length}');
       setState(() {
@@ -109,12 +144,26 @@ class _CategoryPageState extends State<CategoryPage> {
       _currentList.getChildCategory(_categoryModelList[0].bxMallSubDto);
 
       final _goodsList = Provide.value<SubCategory>(context);
-      _goodsList.getCategoryItemModel(CategoryItemModel(comments: '',mallCategoryId: '0', mallSubName: '全部', mallSubId: '0'));
+      _goodsList.getCategoryItemModel(CategoryItemModel(
+          comments: '',
+          mallCategoryId: '0',
+          mallSubName: '全部',
+          mallSubId: '0'));
 
       // category.data.forEach((item) {
       //   print('--category name=== ${item.mallCategoryName}');
       //   item.bxMallSubDto.forEach((subItem) => print('--sub category name=== ${subItem.mallSubName}'));
       // });
+    });
+  }
+
+  void _getCategoryDetail() async {
+    request('categoryPageDetail').then((val) {
+      // print('detail $val');
+      final data = val['data'];
+      setState(() {
+        _detailList = CategoryDetailListModel.fromJson(data['categoryDetail']);
+      });
     });
   }
 }
@@ -237,7 +286,16 @@ class _TopSubCategoryWidgetState extends State<TopSubCategoryWidget> {
         if (_selectIndex != index) {
           // widget.onSelected(index);
           final _currentList = Provide.value<SubCategory>(context);
-          _currentList.getCategoryItemModel(widget.subCategoryList[index - 1]);
+          if (index != 0) {
+            _currentList
+                .getCategoryItemModel(widget.subCategoryList[index - 1]);
+          } else {
+            _currentList.getCategoryItemModel(CategoryItemModel(
+                comments: '',
+                mallCategoryId: '0',
+                mallSubName: '全部',
+                mallSubId: '0'));
+          }
           setState(() {
             _selectIndex = index;
           });
