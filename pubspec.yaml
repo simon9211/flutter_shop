@@ -32,6 +32,8 @@ dependencies:
   #     url: git://github.com/xuelongqy/flutter_easyrefresh.git
   flutter_easyrefresh: ^2.0.4
   provide: ^1.0.2
+  # provider: ^3.2.0
+
 
 dev_dependencies:
   flutter_test:

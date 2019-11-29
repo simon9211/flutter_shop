@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_shop/pages/home_page.dart';
 import 'package:provide/provide.dart';
 import '../service/service_method.dart';
 import '../model/category.dart';
 import '../provide/child_category.dart';
+import '../provide/category_goods_list.dart';
 
 class CategoryPage extends StatefulWidget {
   @override
@@ -49,36 +49,26 @@ class _CategoryPageState extends State<CategoryPage> {
                   builder: (context, child, childCategory) {
                     return TopSubCategoryWidget(
                       childCategory.childCategoryList,
-                      onSelected: (index) {
-                        print('sub index $index');
-                      },
+                      // onSelected: (index) {
+                      //   print('sub index $index');
+                      // },
                     );
                   },
                 ),
                 Expanded(
-                    child: GridView.count(
+                    child: Provide<SubCategory>(
+                  builder: (context, child, item) {
+                    return GridView.count(
                   crossAxisCount: 2,
                   padding: EdgeInsets.all(5.0),
-                  children: List.generate(
-                    10,
-                    (i) => _gridViewItemUI(context, {
-                      "image":
-                          "https://www.baidu.com/img/bd_logo1.png?where=super",
-                      "mallCategoryName": "百度"
-                    }),
+                  children: List.generate(100, (i) => _gridViewItemUI(context, {
+                      "image":"https://www.baidu.com/img/bd_logo1.png?where=super",
+                      "mallCategoryName": item != null? item.subCategoryModel.mallSubName:"百度"}),
                   ),
-                )),
-                Provide<SubCategory>(
-            builder: (context, child, item) {
-                    return Text(
-                      item != null ?
-                      item.subCategoryModel.mallSubName:
-                      'item.subCategoryModel.mallSubName'
-                    );
+                );
                   },
-
-          )
-
+                )
+                ),
               ],
             ),
           ),
@@ -114,6 +104,13 @@ class _CategoryPageState extends State<CategoryPage> {
       setState(() {
         _categoryModelList = category.data;
       });
+
+      final _currentList = Provide.value<ChildCategory>(context);
+      _currentList.getChildCategory(_categoryModelList[0].bxMallSubDto);
+
+      final _goodsList = Provide.value<SubCategory>(context);
+      _goodsList.getCategoryItemModel(CategoryItemModel(comments: '',mallCategoryId: '0', mallSubName: '全部', mallSubId: '0'));
+
       // category.data.forEach((item) {
       //   print('--category name=== ${item.mallCategoryName}');
       //   item.bxMallSubDto.forEach((subItem) => print('--sub category name=== ${subItem.mallSubName}'));
@@ -132,22 +129,14 @@ class LeftCategoryNavi extends StatefulWidget {
 
 class _LeftCategoryNaviState extends State<LeftCategoryNavi> {
   int _selectIndex;
-  bool _isFirst;
   @override
   void initState() {
-    _isFirst = true;
     _selectIndex = 0;
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_isFirst) {
-      final _currentList = Provide.value<ChildCategory>(context);
-      _currentList.getChildCategory(widget.categoryModelList[0].bxMallSubDto);
-      _isFirst = false;
-    }
-
     return Container(
       width: ScreenUtil().setWidth(180),
       decoration: BoxDecoration(
