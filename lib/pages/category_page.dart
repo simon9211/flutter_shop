@@ -4,7 +4,8 @@ import 'package:provide/provide.dart';
 import '../service/service_method.dart';
 import '../model/category.dart';
 import '../provide/child_category.dart';
-import '../provide/category_goods_list.dart';
+// import '../provide/category_goods_list.dart';
+import 'package:flutter_easyrefresh/easy_refresh.dart';
 
 class CategoryPage extends StatefulWidget {
   @override
@@ -59,27 +60,43 @@ class _CategoryPageState extends State<CategoryPage> {
                 ),
                 Expanded(child: Provide<SubCategory>(
                   builder: (context, child, it) {
-                    return GridView.count(
-                      crossAxisCount: 2,
-                      padding: EdgeInsets.all(5.0),
-                      children: _detailList != null
-                          ? List.generate(
-                              _detailList.data.length,
-                              (i) => _gridViewItemUI(context, item: _detailList.data[i], model:it.subCategoryModel),
-                            )
-                          : [Text('null')],
+                    return EasyRefresh(
+                      footer: ClassicalFooter(
+                          bgColor: Colors.green,
+                          textColor: Colors.pink,
+                          infoColor: Colors.pink,
+                          noMoreText: 'no more data',
+                          infoText: 'info text',
+                          loadingText: 'loading …',
+                          loadText: 'loading more',
+                          showInfo: true),
+                      child: GridView.count(
+                        crossAxisCount: 2,
+                        padding: EdgeInsets.all(5.0),
+                        children: _detailList != null
+                            ? List.generate(
+                                _detailList.data.length,
+                                (i) => _gridViewItemUI(context,
+                                    item: _detailList.data[i],
+                                    model: it.subCategoryModel),
+                              )
+                            : [Text('null')],
+                      ),
+                      onLoad: () async {},
+                      onRefresh: () async {},
                     );
                   },
                 )),
               ],
             ),
-          ),
+          )
         ],
       ),
     );
   }
 
-  Widget _gridViewItemUI(BuildContext context, {CategoryDetailItemModel item, CategoryItemModel model}) {
+  Widget _gridViewItemUI(BuildContext context,
+      {CategoryDetailItemModel item, CategoryItemModel model}) {
     return InkWell(
       onTap: () {
         print('click navi item');
@@ -97,8 +114,8 @@ class _CategoryPageState extends State<CategoryPage> {
             alignment: Alignment.topLeft,
             height: 40,
             child: Text(
-              item.goodsName, 
-              maxLines: 2, 
+              item.goodsName,
+              maxLines: 2,
               textAlign: TextAlign.center,
             ),
           ),
@@ -106,24 +123,18 @@ class _CategoryPageState extends State<CategoryPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Text(
-                '¥${item.presentPrice}', 
-                style: TextStyle(
-                  color: Colors.red
-                ),
+                '¥${item.presentPrice}',
+                style: TextStyle(color: Colors.red),
                 textAlign: TextAlign.left,
               ),
               SizedBox(
                 width: 10,
               ),
-              Text(
-                '¥${item.oriPrice}',
-                style: TextStyle(
-                    color: Colors.black26,
-                    decoration: TextDecoration.lineThrough)
-              ),
-              Text(
-                ' (${model.mallSubName})'
-              )
+              Text('¥${item.oriPrice}',
+                  style: TextStyle(
+                      color: Colors.black26,
+                      decoration: TextDecoration.lineThrough)),
+              Text(' (${model.mallSubName})')
             ],
           )
         ],
