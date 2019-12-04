@@ -1,5 +1,3 @@
-
-
 class GoodsDetailModel {
   AdvertesPicture advertesPicture;
   GoodInfo goodInfo;

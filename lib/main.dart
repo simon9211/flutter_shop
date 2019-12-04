@@ -5,7 +5,7 @@ import 'pages/index_page.dart';
 import 'package:provide/provide.dart';
 import 'provide/counter.dart';
 import 'provide/child_category.dart';
-import 'package:fluro/fluro.dart';
+import 'provide/details_info.dart';
 
 
 void main() {
@@ -15,7 +15,7 @@ void main() {
     ..provide(Provider.function((context) => Counter()))
     ..provide(Provider.function((context) => ChildCategory()))
     ..provide(Provider.function((context) => SubCategory()))
-    // ..provide(Provider.function((context) => CategoryGoodsListProvide()))
+    ..provide(Provider.function((context) => DetailsInfoProvide()))
     ;
 
   runApp(ProviderNode(

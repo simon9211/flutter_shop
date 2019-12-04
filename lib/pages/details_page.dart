@@ -1,47 +1,43 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_shop/service/service_method.dart';
+import 'package:flutter_shop/provide/details_info.dart';
 import '../model/detail.dart';
+import 'package:provide/provide.dart';
 
-class DetailsPage extends StatefulWidget {
+class DetailsPage extends StatelessWidget {
 
   final String goodsId;
 
   const DetailsPage({Key key, this.goodsId}) : super(key: key);
 
   @override
-  _DetailsPageState createState() => _DetailsPageState();
-}
-
-class _DetailsPageState extends State<DetailsPage> {
-
-  GoodsDetailModel _detailModel;
-
-  @override
-  void initState() {
-    request('goodsDetail', formData: {'goodId':'${widget.goodsId}'}).then((val){
-      print('detail===== $val');
-      final data = val['data'];
-      setState(() {
-        _detailModel = GoodsDetailModel.fromJson(data);
-        print('model===== $val');
-      });
-    });
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    var name = _detailModel != null?_detailModel.goodInfo.goodsName:'111';
     return Scaffold(
       appBar: AppBar(
         title: Text('商品详情'),
       ),
-      body: Container(
-        child: Center(
-          child: Text('商品id ${widget.goodsId} name $name'),
-        ),
+      body: FutureBuilder(
+        future: _getDetailInfo(context),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return Container(
+              child: Column(
+                children: <Widget>[
+                  Text('商品id $goodsId')
+                ],
+              ),
+            );
+          } else {
+            return Text('loading');
+          }
+        },
       ),
     );
+  }
+
+  Future _getDetailInfo(BuildContext context) async {
+    Provide.value<DetailsInfoProvide>(context).getGoodsInfo(goodsId);
+    print('done');
+    return 'done';
   }
 }
 
