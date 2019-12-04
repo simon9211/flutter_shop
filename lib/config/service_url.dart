@@ -4,5 +4,6 @@ const Map servicePath = {
   'homePageBelowContent': serviceUrl + 'home/below',    // 首页火爆专区
   'categoryPageContent': serviceUrl + 'category',       // 分类
   'categoryPageDetail': serviceUrl + 'category/detailList', // 分类详情
+  'goodsDetail': serviceUrl + 'goodsdetail',            // 商品详情 
 
 };
