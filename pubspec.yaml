@@ -33,6 +33,8 @@ dependencies:
   flutter_easyrefresh: ^2.0.4
   provide: ^1.0.2
   # provider: ^3.2.0
+  fluttertoast: ^3.1.3
+  fluro: ^1.5.1
 
 
 dev_dependencies:

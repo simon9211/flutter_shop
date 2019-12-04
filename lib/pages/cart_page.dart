@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provide/provide.dart';
 import '../provide/counter.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class CartPage extends StatelessWidget {
   @override
@@ -38,6 +39,14 @@ class MyButton extends StatelessWidget {
       child: RaisedButton(
         onPressed: () {
           currentCounter.increment();
+          Fluttertoast.showToast(
+            msg: 'click increment button',
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.CENTER,
+            backgroundColor: Colors.pink,
+            textColor: Colors.white,
+            fontSize: 16
+          );
         },
         child: Text('递增'),
       ),
