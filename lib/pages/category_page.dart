@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_shop/routers/routers.dart';
 import 'package:provide/provide.dart';
 import '../service/service_method.dart';
 import '../model/category.dart';
@@ -100,6 +101,7 @@ class _CategoryPageState extends State<CategoryPage> {
     return InkWell(
       onTap: () {
         print('click navi item');
+        Application.router.navigateTo(context,"/detail?id=${item.goodsId}");
       },
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_shop/routers/routers.dart';
 
 import 'pages/index_page.dart';
 import 'package:provide/provide.dart';
 import 'provide/counter.dart';
 import 'provide/child_category.dart';
-// import 'provide/category_goods_list.dart';
+import 'package:fluro/fluro.dart';
+
 
 void main() {
   // var counter = Counter();
@@ -16,7 +18,6 @@ void main() {
     // ..provide(Provider.function((context) => CategoryGoodsListProvide()))
     ;
 
-
   runApp(ProviderNode(
     child: MyApp(),
     providers: providers,
@@ -26,6 +27,7 @@ void main() {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    Routes.configDetailRoutes(Application.router);
     return Container(
       child: MaterialApp(
         title: '百姓生活+',
