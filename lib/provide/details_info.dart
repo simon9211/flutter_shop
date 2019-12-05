@@ -3,9 +3,9 @@ import '../model/detail.dart';
 import '../service/service_method.dart';
 
 class DetailsInfoProvide with ChangeNotifier {
-  GoodsDetailModel _goodsDetailModel;
+  GoodsDetailModel goodsDetailModel;
 
-  GoodsDetailModel get goodsDetailModel => _goodsDetailModel;
+  //GoodsDetailModel get goodsDetailModel => _goodsDetailModel;
 
   // 获取后台信息
   void getGoodsInfo(String id) {
@@ -13,9 +13,16 @@ class DetailsInfoProvide with ChangeNotifier {
     request('goodsDetail', formData: formData).then((val){
       final data = val['data'];
       print('detail===== $data');
-      _goodsDetailModel = GoodsDetailModel.fromJson(data);
+      goodsDetailModel = GoodsDetailModel.fromJson(data);
       notifyListeners();
     });
   }
 
+  int idx = 0;
+  void tabSelectIndex(int index) {
+    idx = index;
+    notifyListeners();
+  }
+
 }
+

@@ -36,20 +36,20 @@ class GoodsDetailModel {
 }
 
 class AdvertesPicture {
-  String pICTUREADDRESS;
-  String tOPLACE;
+  String pictureAddress;
+  String toPlace;
 
-  AdvertesPicture({this.pICTUREADDRESS, this.tOPLACE});
+  AdvertesPicture({this.pictureAddress, this.toPlace});
 
   AdvertesPicture.fromJson(Map<String, dynamic> json) {
-    pICTUREADDRESS = json['PICTURE_ADDRESS'];
-    tOPLACE = json['TO_PLACE'];
+    pictureAddress = json['PICTURE_ADDRESS'];
+    toPlace = json['TO_PLACE'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['PICTURE_ADDRESS'] = this.pICTUREADDRESS;
-    data['TO_PLACE'] = this.tOPLACE;
+    data['PICTURE_ADDRESS'] = this.pictureAddress;
+    data['TO_PLACE'] = this.toPlace;
     return data;
   }
 }

@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_shop/provide/details_info.dart';
 import '../model/detail.dart';
 import 'package:provide/provide.dart';
+import 'detailWidgets/details_tabbar.dart';
+import 'detailWidgets/details_top_area.dart';
+import 'detailWidgets/detail_explain.dart';
+
 
 class DetailsPage extends StatelessWidget {
-
   final String goodsId;
 
   const DetailsPage({Key key, this.goodsId}) : super(key: key);
@@ -22,9 +25,11 @@ class DetailsPage extends StatelessWidget {
             return Container(
               child: Column(
                 children: <Widget>[
-                  Text('商品id $goodsId')
+                  DetailsTopArea(),
+                  DetailsExplain(),
+                  DetailTabBar()
                 ],
-              ),
+              )
             );
           } else {
             return Text('loading');
@@ -40,4 +45,3 @@ class DetailsPage extends StatelessWidget {
     return 'done';
   }
 }
-
