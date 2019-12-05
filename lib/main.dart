@@ -6,6 +6,7 @@ import 'package:provide/provide.dart';
 import 'provide/counter.dart';
 import 'provide/child_category.dart';
 import 'provide/details_info.dart';
+import 'provide/cart.dart';
 
 
 void main() {
@@ -16,6 +17,7 @@ void main() {
     ..provide(Provider.function((context) => ChildCategory()))
     ..provide(Provider.function((context) => SubCategory()))
     ..provide(Provider.function((context) => DetailsInfoProvide()))
+    ..provide(Provider.function((context) => CartProvide()))
     ;
 
   runApp(ProviderNode(
@@ -38,3 +40,5 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
+
