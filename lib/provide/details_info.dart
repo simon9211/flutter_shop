@@ -8,7 +8,7 @@ class DetailsInfoProvide with ChangeNotifier {
   //GoodsDetailModel get goodsDetailModel => _goodsDetailModel;
 
   // 获取后台信息
-  void getGoodsInfo(String id) {
+  void getGoodsInfo(String id) async {
     var formData = {'goodsId':id};
     request('goodsDetail', formData: formData).then((val){
       final data = val['data'];
