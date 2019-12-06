@@ -7,88 +7,56 @@ import 'package:fluttertoast/fluttertoast.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 import '../provide/cart.dart';
+import 'cart_page/cart_item.dart';
 
-class CartPage extends StatefulWidget {
-  @override
-  _CartPageState createState() => _CartPageState();
-}
-
-class _CartPageState extends State<CartPage> {
-  List<String> testList = [];
+class CartPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    _show();
-    return Container(
-        child: Column(
-      children: <Widget>[
-        Container(
-          height: 500,
-          child: ListView.builder(
-            itemCount: testList.length,
-            itemBuilder: (context, index) {
-              return ListTile(
-                title: Text(testList[index]),
-              );
-            },
-          ),
-        ),
-        RaisedButton(
-          onPressed: () {
-            _add();
-          },
-          child: Text('add'),
-        ),
-        RaisedButton(
-          onPressed: () {
-            _clear();
-          },
-          child: Text('clear'),
-        ),
-      ],
-    ));
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('购物车'),
+      ),
+      body: FutureBuilder(
+        future: _getCartInfo(context),
+        builder: (context, snapshot) {
+          List cartList = Provide.value<CartProvide>(context).cartList;
+          if (snapshot.hasData) {
+            return Stack(
+              children: <Widget>[
+                Provide<CartProvide>(
+                  builder: (context, child, model) {
+                    cartList = Provide.value<CartProvide>(context).cartList;
+                    return ListView.builder(
+                      itemCount: cartList.length,
+                      itemBuilder: (context, index) {
+                        return CartItem(
+                          item: cartList[index],
+                        );
+                        // return ListTile(
+                        //   title: Text(cartList[index].goodsName + '${cartList[index].count}'),
+                        // );
+                      },
+                    );
+                  },
+                ),
+                Positioned(
+                  bottom: 0,
+                  left: 0,
+                  child: CartBottom(),
+                )
+              ],
+            );
+          } else {
+            return Text('loading');
+          }
+        },
+      ),
+    );
   }
 
-  void _add() async {
-    // SharedPreferences preferences = await SharedPreferences.getInstance();
-    // String temp = 'Simon';
-    // testList.add(temp);
-    // preferences.setStringList('testInfo', testList);
-
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    var cartString = preferences.getString(cartKey);
-    var temp = cartString == null ? [] : json.decode(cartString.toString());
-
-    List<Map> tempList = (temp as List).cast();
-
-    int ival = 0;
-
-    tempList.forEach((item) {
-      tempList[ival]['count'] = item['count'] + 1;
-      testList.add(tempList[ival]['goodsName']);
-      ival++;
-      preferences.setStringList('testInfo', testList);
-    });
-
-    _show();
-  }
-
-  void _show() async {
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    setState(() {
-      String temp = preferences.getString('cartKey');
-      if (temp != null) {
-        testList.add(temp);
-      }
-    });
-  }
-
-  void _clear() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    //prefs.clear(); //全部清空
-    prefs.remove('testInfo'); //删除key键
-    setState(() {
-      testList = [];
-    });
+  Future<String> _getCartInfo(BuildContext context) async {
+    await Provide.value<CartProvide>(context).getCartInfo();
+    return 'end';
   }
 }
 
