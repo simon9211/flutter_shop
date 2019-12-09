@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_shop/routers/routers.dart';
 
 class MemberPage extends StatelessWidget {
   List _items = [['待付款', Icons.party_mode],['待发货', Icons.query_builder], ['待收货', Icons.receipt], ['待评价', Icons.note]];
@@ -14,7 +15,7 @@ class MemberPage extends StatelessWidget {
           _topHeader(),
           _orderTitle(),
           _orderCategory(),
-          _actionList()
+          _actionList(context)
         ],
       )
     );
@@ -92,19 +93,19 @@ class MemberPage extends StatelessWidget {
     );
   }
 
-  Widget _actionList() {
+  Widget _actionList(context) {
     List titles = [ '领取优惠券', '已领取优惠券', '地址管理', '客服电话', '关于我们'];
     return Container(
       margin: EdgeInsets.only(top: 10),
       child: Column(
         children: titles.map((title){
-          return _customListTile(title);
+          return _customListTile(context, title);
         }).toList(),
       ),
     );
   }
 
-  Widget _customListTile(String title) {
+  Widget _customListTile(context,String title) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -116,6 +117,9 @@ class MemberPage extends StatelessWidget {
         leading: Icon(Icons.blur_circular),
         title: Text(title),
         trailing: Icon(Icons.arrow_right),
+        onTap: (){
+          Application.router.navigateTo(context,"/mapView?name=mapView");
+        },
       ),
     );
   }

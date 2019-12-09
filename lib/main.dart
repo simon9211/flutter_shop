@@ -19,7 +19,6 @@ void main() {
     ..provide(Provider.function((context) => DetailsInfoProvide()))
     ..provide(Provider.function((context) => CartProvide()))
     ;
-
   runApp(ProviderNode(
     child: MyApp(),
     providers: providers,
@@ -30,6 +29,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Routes.configDetailRoutes(Application.router);
+    Routes.configMapViewRoutes(Application.router);
     return Container(
       child: MaterialApp(
         title: '百姓生活+',
